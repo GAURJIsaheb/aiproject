@@ -1,5 +1,6 @@
 "use client"
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   Home,
   Compass,
@@ -29,13 +30,13 @@ function Sidebar() {
   }, []);
 
   const menuItems = [
-    { icon: Home, label: "Dashboard", badge: "" },
-    { icon: Compass, label: "Discover", badge: "New" },
-    { icon: Users, label: "Team", badge: "" },
-    { icon: FolderOpen, label: "Projects", badge: "3" },
-    { icon: BarChart3, label: "Analytics", badge: "" },
-    { icon: Star, label: "Favorites", badge: "" },
-    { icon: Bell, label: "Notifications", badge: "5" },
+
+    { id:1,icon: Compass, label: "Discover", path:'/discover',badge: "New" },
+    { id:2,icon: Users, label: "Team",path:'/Team', badge: "" },
+    { id:3,icon: FolderOpen, label: "Projects", path:'/Projects',badge: "3" },
+    { id:4,icon: BarChart3, label: "Analytics",path:'/Analytics', badge: "" },
+    { id:5,icon: Star, label: "Favorites", path:'/Favorites',badge: "" },
+    { id:6,icon: Bell, label: "Notifications", path:'/Notifications-list',badge: "5" },
   ];
 
   const bottomMenuItems = [
@@ -77,41 +78,46 @@ function Sidebar() {
         </div>
       </div>
 
-      {/* Menu Items */}
-      <div className="px-3 py-2">
-        <nav className="space-y-1">
-          {menuItems.map((item, idx) => (
-            <a
-              key={idx}
-              href="#"
+  
+
+    {/* Menu Items */}
+    <div className="px-3 py-2">
+      <nav className="space-y-1">
+        {menuItems.map((item) => (
+          <Link
+            key={item.id}
+            href={item.path}
+            className={cn(
+              "flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 group relative",
+              !isOpen && "justify-center"
+            )}
+          >
+            <item.icon
               className={cn(
-                "flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 group relative",
-                !isOpen && "justify-center"
-              )}
-            >
-              <item.icon className={cn(
                 "h-5 w-5 text-gray-500 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors",
                 !isOpen && "h-6 w-6"
-              )} />
-              {isOpen && (
-                <>
-                  <span className="font-medium group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                    {item.label}
+              )}
+            />
+            {isOpen && (
+              <>
+                <span className="font-medium group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                  {item.label}
+                </span>
+                {item.badge && (
+                  <span className="absolute right-3 bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded-full text-xs font-medium">
+                    {item.badge}
                   </span>
-                  {item.badge && (
-                    <span className="absolute right-3 bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded-full text-xs font-medium">
-                      {item.badge}
-                    </span>
-                  )}
-                </>
-              )}
-              {!isOpen && item.badge && (
-                <span className="absolute top-0 right-0 h-2 w-2 bg-indigo-500 rounded-full" />
-              )}
-            </a>
-          ))}
-        </nav>
-      </div>
+                )}
+              </>
+            )}
+            {!isOpen && item.badge && (
+              <span className="absolute top-0 right-0 h-2 w-2 bg-indigo-500 rounded-full" />
+            )}
+          </Link>
+        ))}
+      </nav>
+    </div>
+
 
       {/* Bottom Section */}
       <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200 dark:border-gray-800 px-3 py-4">
