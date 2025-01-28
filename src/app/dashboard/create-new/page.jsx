@@ -14,8 +14,12 @@ function CreateNewVideo() {
   const [videoScriptData, setvideoScriptData] = useState();
   const [audioUrl, setAudioUrl] = useState(null);
 
+  //saving constants
+  const [captions,setcaptions]=useState();
+
   const HandleSubmitButton = () => {
     GetVideoScript();
+    GenerateCaptions(audioUrl);
   };
 
   const onhandleInputChange = (fieldname, fieldvalue) => {
@@ -25,6 +29,7 @@ function CreateNewVideo() {
       [fieldname]: fieldvalue
     }));
   };
+
 
   // Get video Script from API --> /api/get-video-script
   const GetVideoScript = async () => {
@@ -42,13 +47,16 @@ function CreateNewVideo() {
         prompt: Makeprompt
       })
       .then((res) => {
-        console.log(res.data.result);
+        //console.log(res.data.result);
         setvideoScriptData(res.data.result);
         GenerateAudioScriptFile(res.data.result);
       });
     setloading(false);
   };
 
+
+
+   // Get generate audio file from API --> /api/get-textTOspeech
   const GenerateAudioScriptFile = async (videoScriptData) => {
     setloading(true);
 
@@ -68,6 +76,7 @@ function CreateNewVideo() {
       if (response.status === 200) {
         const { audioUrl } = response.data;
         setAudioUrl(audioUrl); // Save URL for playback/download
+        console.log(audioUrl);
       } else {
         console.error('Failed to generate audio:', response.data);
       }
@@ -77,6 +86,25 @@ function CreateNewVideo() {
       setloading(false);
     }
   };
+
+
+
+  //Get generate caption from aoi --> /api/generate-captions
+  const GenerateCaptions=async(audioUrl)=>{
+   
+    setloading(true)
+    await axios.post("/api/generate-captions",{
+      
+      audiofileUrl:audioUrl
+          
+          
+    }).then(resp=>{
+      console.log(resp.data.result)
+      setcaptions(resp.data.result)
+    })
+    setloading(true)
+
+  }
 
   return (
     <div className="md:px-20 mt-[25px] ">
