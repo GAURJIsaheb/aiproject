@@ -8,7 +8,14 @@ function Header() {
   return (
     <div className="p-3 z-50 px-5 flex items-center justify-between shadow-md bg-opacity-60 w-full"> {/* Fixed header */}
         <div className='flex gap-3 items-center'>
-            <Image className="rounded-full" src={"/Logo.jpg"} alt="logo" width={100} height={100} />
+        <Image
+        className="rounded-full"
+        src="/Logo.jpg"
+        alt="logo"
+        width={100}
+        height={100}
+        layout="intrinsic"
+/>
             <h2 className="font-bold text-white">Ai Short Video</h2>
         </div>
         <div className="flex items-center">

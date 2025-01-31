@@ -1,15 +1,27 @@
 import { NextResponse } from "next/server";
 import { chatSession } from "../../../../configs/AiModel";
 
-export async function POST(req){
+export async function POST(req) {
     try {
-        const {prompt}=await req.json();
+        const { prompt } = await req.json();
         console.log(prompt);
 
-        const result=await chatSession.sendMessage(prompt);
-        console.log(result.response.text());
-        return NextResponse.json({'result':JSON.parse(result.response.text()),success:true})
+        const result = await chatSession.sendMessage(prompt);
+        const responseText = await result.response.text();
+
+       // console.log("Raw Response:", responseText);
+
+        let parsedResult;
+        try {
+            parsedResult = JSON.parse(responseText);
+        } catch (jsonError) {
+            console.error("JSON Parsing Error:", jsonError);
+            return NextResponse.json({ error: "Invalid JSON format from AI response", success: false });
+        }
+
+        return NextResponse.json({ result: parsedResult, success: true });
     } catch (error) {
-        return NextResponse.json({'Error':"an Error Occured in get-video-script route"+error,success:false})
+        console.error("Error in get-video-script route:", error);
+        return NextResponse.json({ error: "An error occurred in get-video-script route: " + error, success: false });
     }
 }

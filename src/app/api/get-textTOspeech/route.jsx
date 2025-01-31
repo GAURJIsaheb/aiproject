@@ -25,7 +25,7 @@ export async function POST(req) {
     // Read generated audio file
     const audioBuffer = await fs.readFile(filePath);
     // Log cloudinary to check if it's properly initialized
-    console.log(cloudinary);  // Add this log to check the object
+    //console.log(cloudinary);  // Add this log to check the object
 
  // Upload audio to Cloudinary
   const result = await new Promise((resolve, reject) => {
