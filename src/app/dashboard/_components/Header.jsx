@@ -12,10 +12,12 @@ function Header() {
         className="rounded-full"
         src="/Logo.jpg"
         alt="logo"
-        width={100}
-        height={100}
-        layout="intrinsic"
+        width={70}
+        height={50}
+
+        style={{ width: "auto", height: "auto" }}
 />
+
             <h2 className="font-bold text-white">Ai Short Video</h2>
         </div>
         <div className="flex items-center">

@@ -1,47 +1,33 @@
-import {cloudinary } from '../../../../configs/CloudinaryConfig';
-import { auth } from '@clerk/nextjs/server';
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
+import { chatSession } from "../../../../configs/AiModel";
 
 export async function POST(req) {
-  const { userId } = auth();
+    try {
+        const { prompt } = await req.json();
+        console.log(prompt);
 
-  if (!userId) {
-    return NextResponse.json({ error: "Unauthorized User" }, { status: 401 });
-  }
+        const result = await chatSession.sendMessage(prompt);
+        const responseText = result.response.text();
 
-  try {
-    const formData = await req.formData();
-    const file = formData.get("file");
+        console.log("Raw Response:", responseText);
 
-    if (!file) {
-      return NextResponse.json({ error: "File not found in request" }, { status: 400 });
-    }
-
-    // Convert file to buffer
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    // Upload to Cloudinary
-    const result = await new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        { folder: "aiproject-audio-folder", resource_type: "video" },
-        (error, result) => {
-          if (error) return reject(error);
-          resolve(result);
+        let parsedResult;
+        try {
+            // Parse the raw response as JSON
+            parsedResult = JSON.parse(responseText);
+        } catch (jsonError) {
+            console.error("JSON Parsing Error:", jsonError);
+            return NextResponse.json({ error: "Invalid JSON format from AI response", success: false });
         }
 
-      );
-      if (!cloudinary.uploader || !cloudinary.uploader.upload_stream) {
-        throw new Error("Cloudinary uploader or upload_stream is undefined");
-      }
-      
-      audioStream.pipe(uploadStream); // Replace `audioStream` with your actual stream
-    });
-    
+        // Validate the structure of the parsed result
+        if (!parsedResult.videoScript || !Array.isArray(parsedResult.videoScript)) {
+            return NextResponse.json({ error: "Invalid structure: videoScript is missing or not an array", success: false });
+        }
 
-    return NextResponse.json({ public_id: result.public_id, secure_url: result.secure_url }, { status: 200 });
-  } catch (error) {
-    console.error("Audio Upload Failed:", error);
-    return NextResponse.json({ error: "Audio Upload Failed" }, { status: 500 });
-  }
+        return NextResponse.json({ result: parsedResult, success: true });
+    } catch (error) {
+        console.error("Error in get-video-script route:", error);
+        return NextResponse.json({ error: "An error occurred in get-video-script route: " + error, success: false });
+    }
 }

@@ -8,6 +8,9 @@ import axios from 'axios';
 import CustomLoading from './_components/CustomLoading';
 import { v4 as uuidv4 } from 'uuid';
 import { VideoDataContext } from '@/app/_context/videoDataContext';
+import { db_VAR } from '../../../../configs/db';
+import { useUser } from '@clerk/nextjs';
+import { videoDataTableName } from '../../../../configs/schema';
 
 function CreateNewVideo() {
   const [formDataa, setformdata] = useState({});
@@ -19,6 +22,9 @@ function CreateNewVideo() {
 
   //use context
   const {videoData,setvideoData}=useContext(VideoDataContext)
+
+  //getting user email/id  from clerk:jis bhi id se sign in hua ho user
+  const {user}=useUser();
 
 
 
@@ -58,9 +64,10 @@ function CreateNewVideo() {
 
             setvideoData(prev => ({
                 ...prev,
-                videoScript: videoScriptArray
+                'videoScript': videoScriptArray
             }));
             setvideoScriptData(videoScriptArray);
+           // console.log("SCript data--->",videoScriptArray);
 
             await GenerateAudioScriptFile(videoScriptArray);
         } else {
@@ -97,7 +104,7 @@ function CreateNewVideo() {
       });
         setvideoData(prev=>({
           ...prev,
-          'audiofile':resp.data.audioUrl
+          'audiofileUrl':resp.data.audioUrl
         }))
 
         // *** main :console.log("Full Api Response in Audio Script File Url:",resp.data)
@@ -133,7 +140,7 @@ function CreateNewVideo() {
         }))
 
         setcaptions(resp?.data?.result)
-       /*
+       
 
 
 
@@ -141,21 +148,15 @@ function CreateNewVideo() {
 
 
        
-        resp?.data?.result && await generateImage(videoScriptData);
+    //resp?.data?.result && await generateImage(videoScriptData);
 
-
-
-
-
-
-        */
     } catch (error) {
       console.error("Error generating captions:", error.message || error);
     } finally {
 
       setloading(false);
     }
-    console.log(captions,audioUrl,videoScriptData)
+    //console.log(captions,audioUrl,videoScriptData)
   };
 
 
@@ -168,34 +169,81 @@ function CreateNewVideo() {
   //To generate images from prompt--> using Replicate ai
   const generateImage = async (videoScriptData) => {
     setloading(true);
-    try {
-      const firstPrompt = videoScriptData[0]?.imagePrompt[0]; // Get the first image prompt
-      if (firstPrompt) {
+  
+    let images = [];
+    const maxImages = 4; // Limit to 4 images
+    const limitedScriptData = videoScriptData.slice(0, maxImages); // Take first 5 elements,,that generate 5 images
+  
+    for (const element of limitedScriptData) {
+      try {
         const resp = await axios.post('/api/generate-images', {
-          promptdata: firstPrompt
+          promptdata: element.imagePrompt, // Generate images from prompts
         });
   
-        setvideoData(prev => ({
+        setvideoData((prev) => ({
           ...prev,
-          'images': resp.data.result
+          'imagesUrl': [...(prev.imagesUrl || []), resp.data.result], // Store images in state
         }));
   
-        setImageList([resp.data.result]); // Set the first generated image to the state
+        images.push(resp.data.result);
+      } catch (error) {
+        console.error("Error generating image:", error);
+      } finally {
+        setImageList(images);
+        setloading(false);
       }
+    }
+  };
+  
+
+
+
+
+  useEffect(() => {
+    if (videoData?.videoScript && videoData?.audiofileUrl && videoData?.captions && videoData?.imagesUrl) {
+      console.log("Saving Video Data:", videoData);
+      SaveVideoData(videoData);
+    } else {
+      console.log("Error in useEffect: Missing fields", videoData);
+    }
+  }, [videoData]);
+  
+
+
+
+
+
+  //Method-->jo hmare Database mai,,store krayega Data,,table name se data jaata hai
+  const SaveVideoData = async (videoData) => {
+    setloading(true);
+  
+    try {
+      if (
+        !videoData?.videoScript ||
+        !Array.isArray(videoData.imagesUrl) ||
+        videoData.imagesUrl.length !== 4
+      ) {
+        console.error("Error: Missing videoScript or exactly 4 image URLs required.", videoData);
+        return;
+      }
+  
+      const result = await db_VAR.insert(videoDataTableName)
+        .values({
+          videoScript: videoData.videoScript,
+          audiofileUrl: videoData.audiofileUrl || "",
+          captions: videoData.captions || [],
+          imagesUrl: videoData.imagesUrl, // Must be an array of 5 URLs
+        })
+        .returning();
+  
+      console.log("Saved data:", result);
     } catch (error) {
-      console.error("Error generating first image:", error);
+      console.error("Error saving video data:", error);
     } finally {
       setloading(false);
     }
   };
-  
-  useEffect(()=>{
-    console.log(videoData)
-  },[videoData])
 
-
-
-  
 
   return (
     <div className="md:px-20 mt-[25px] ">
