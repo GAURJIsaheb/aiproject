@@ -21,9 +21,9 @@ function SelectDuration({onUserSelect}) {
             </SelectTrigger>
             <SelectContent>
 
-                <SelectItem  value={10}>10 Seconds</SelectItem>
+                <SelectItem  value={5}>10 Seconds</SelectItem>
                 
-                <SelectItem value={22}>20 Seconds</SelectItem>
+                <SelectItem value={11}>20 Seconds</SelectItem>
             </SelectContent>
         </Select>
         </div>

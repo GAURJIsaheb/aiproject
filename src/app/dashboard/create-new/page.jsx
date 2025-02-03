@@ -11,6 +11,7 @@ import { VideoDataContext } from '@/app/_context/videoDataContext';
 import { db_VAR } from '../../../../configs/db';
 import { useUser } from '@clerk/nextjs';
 import { videoDataTableName } from '../../../../configs/schema';
+import PlayerDialog from '../_components/PlayerDialog';
 
 function CreateNewVideo() {
   const [formDataa, setformdata] = useState({});
@@ -19,6 +20,11 @@ function CreateNewVideo() {
   const [audioUrl, setAudioUrl] = useState(null);
   const [imageList, setImageList] = useState([]);
   const [captions,setcaptions]=useState(null);
+  
+  //To Play Video
+  const[playVideoValue,setplayVideoValue]=useState(true)
+  const[videoIdValue,setvideoIdValue]=useState(7)//manually passed id-> 7
+
 
   //use context
   const {videoData,setvideoData}=useContext(VideoDataContext)
@@ -237,6 +243,9 @@ function CreateNewVideo() {
         .returning();
   
       console.log("Saved data:", result);
+      setvideoIdValue(result[0].id);
+      setplayVideoValue(true)
+
     } catch (error) {
       console.error("Error saving video data:", error);
     } finally {
@@ -257,14 +266,7 @@ function CreateNewVideo() {
         </Button>
       </div>
       <CustomLoading loading={loading} />
-      {/* Display generated content   */}
-      {audioUrl && <audio controls src={audioUrl} />}
-
-      {imageList.length > 0 &&
-        imageList.map((image, index) => (
-        <img key={index} src={image} alt="Generated AI" className="w-full h-auto mt-4" />
-  ))
-}
+      <PlayerDialog playVideo={playVideoValue} videoId={videoIdValue}/>
 
     </div>
   );
