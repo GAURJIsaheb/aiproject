@@ -1,5 +1,5 @@
-"use client"
-import React, { useEffect, useState } from 'react'
+"use client";
+import React, { useEffect, useState } from "react";
 import { Player } from "@remotion/player";
 import {
   Dialog,
@@ -8,47 +8,79 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import RemotionVideo from './RemotionVideo';
-import { Button } from '@/components/ui/button';
-import { db_VAR } from '../../../../configs/db';
-import { videoDataTableName } from '../../../../configs/schema';
-import { eq } from 'drizzle-orm';
+} from "@/components/ui/dialog";
+import RemotionVideo from "./RemotionVideo";
+import { Button } from "@/components/ui/button";
+import { db_VAR } from "../../../../configs/db";
+import { videoDataTableName } from "../../../../configs/schema";
+import { eq } from "drizzle-orm";
 
-
-function PlayerDialog({ playVideo, videoId }) {
-  const [openDialog, setopenDialog] = useState(false)
-  const [fetchedData, setfetchedData] = useState();
-  //to get the length of our video accurately
-  const[frameValues,setframeValues]=useState(100)
-  
+function PlayerDialog({ playVideo, videoId, onClose }) {
+  const [openDialog, setOpenDialog] = useState(false);
+  const [fetchedData, setFetchedData] = useState();
+  const [frameValues, setFrameValues] = useState(100);
+  const [downloadUrl, setDownloadUrl] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setopenDialog(playVideo)
+    setOpenDialog(playVideo);
+    if (videoId) GetVideoData();
+  }, [playVideo]);
 
-    videoId && GetVideoData();
-  }, [playVideo])
-
-
-  //to fetch data from the Database
+  // Fetch video data from the database
   const GetVideoData = async () => {
-    const result = await db_VAR.select().from(videoDataTableName)
-      .where(eq(videoDataTableName.id, videoId));//DB mai jo id equal to aa rhi videoId k,, vo fetch krlo,, eq drizzle se imported hai
+    const result = await db_VAR
+      .select()
+      .from(videoDataTableName)
+      .where(eq(videoDataTableName.id, videoId));
 
     console.log("Fetched Result is:", result);
-    setfetchedData(result[0])
-  }
+    setFetchedData(result[0]);
+  };
+
+  // Handle cancel button
+  const handleCancel = () => {
+    setOpenDialog(false);
+    setDownloadUrl(null);
+    onClose?.(); // Call parent close function if provided
+  };
+
+  // Handle video export
+  const handleExport = async () => {
+    console.log("Exporting video...");
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/render-video", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ videoId, frameValues, fetchedData }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setDownloadUrl(data.url);
+        console.log("Video rendered successfully:", data.url);
+      } else {
+        console.error("Video rendering failed:", data.error);
+      }
+    } catch (error) {
+      console.error("Error exporting video:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <Dialog  open={openDialog}>
-
-      <DialogContent className="justify-center">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold justify-center text-center my-5">Requested Video :</DialogTitle>
-          <DialogDescription>
-
-          </DialogDescription>
+    <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+      <DialogContent className=" justify-center sm:p-4 rounded-lg bg-white shadow-lg max-w-md w-full">
+        <DialogHeader className="p-0">
+          <DialogTitle className="text-lg font-bold text-center my-2">
+            Requested Video
+          </DialogTitle>
+          <DialogDescription />
         </DialogHeader>
+
         <Player
           component={RemotionVideo}
           durationInFrames={Number(frameValues.toFixed(0))}
@@ -56,23 +88,34 @@ function PlayerDialog({ playVideo, videoId }) {
           compositionHeight={450}
           fps={30}
           controls={true}
-          inputProps={
-            {
-              ... fetchedData,
-              setTotalduration:(Totalduration)=>setframeValues(Totalduration)
-              
-            }
-          }
+          inputProps={{
+            ...fetchedData,
+            setTotalduration: (Totalduration) => setFrameValues(Totalduration),
+          }}
         />
-        <div className="flex justify-center gap-10">
-          <Button>Cancel</Button>
-          <Button className="bg-purple-700">Export</Button>
+
+        <div className="flex justify-center gap-5 mt-4">
+          <Button onClick={handleCancel}  className="bg-black text-white">
+            Cancel
+          </Button>
+          <Button onClick={handleExport} className="bg-purple-700" disabled={loading}>
+            {loading ? "Exporting..." : "Export"}
+          </Button>
         </div>
 
+        {downloadUrl && (
+          <div className="text-center mt-4">
+            <a href={downloadUrl} download className="text-blue-500 font-bold">
+              Download Video
+            </a>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
-
-  )
+  );
 }
 
-export default PlayerDialog
+export default PlayerDialog;
+
+//npm install @remotion/renderer --> used in Exporting the video
+

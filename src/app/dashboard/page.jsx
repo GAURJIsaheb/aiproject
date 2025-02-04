@@ -3,9 +3,15 @@ import { Button } from '@/components/ui/button'
 import React, { useState } from 'react'
 import EmptyState from './_components/EmptyState'
 import Link from 'next/link'
+import { db_VAR } from '../../../configs/db'
+import { videoDataTableName } from '../../../configs/schema'
+import { eq } from 'drizzle-orm'
 
 function Dashboard() {
   const [videolist, setvideolist] = useState([])
+
+  // const resp=await db_VAR.select().from(videoDataTableName)
+  // .where(eq(videoDataTableName?.cre))
 
   return (
     <div className="pt-10"> {/* Add padding-top to prevent overlap with sticky header */}
@@ -21,6 +27,8 @@ function Dashboard() {
           <EmptyState />
         </div>
       )}
+
+      {/*To show all list of videos ,,jo bun chuki hai pehle se */}
     </div>
   )
 }

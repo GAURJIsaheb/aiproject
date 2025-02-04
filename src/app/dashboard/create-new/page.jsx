@@ -23,7 +23,7 @@ function CreateNewVideo() {
   
   //To Play Video
   const[playVideoValue,setplayVideoValue]=useState(true)
-  const[videoIdValue,setvideoIdValue]=useState(7)//manually passed id-> 7
+  const[videoIdValue,setvideoIdValue]=useState("f512ee39-f0cf-451d-af2e-b52a49101c21")
 
 
   //use context
@@ -239,6 +239,7 @@ function CreateNewVideo() {
           audiofileUrl: videoData.audiofileUrl || "",
           captions: videoData.captions || [],
           imagesUrl: videoData.imagesUrl, // Must be an array of 5 URLs
+          createdBy:user?.primaryEmailAddress?.emailAddress
         })
         .returning();
   

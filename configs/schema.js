@@ -20,5 +20,6 @@ export const videoDataTableName = pgTable("videoDataTableName", {
   audiofileUrl: text("audiofile_url").notNull(),
   captions: jsonb("captions").notNull(),
   imagesUrl: jsonb("images_url").notNull(),
+  createdBy:text("createdBy").notNull()
 });
 
