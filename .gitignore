@@ -16,6 +16,7 @@
 # next.js
 /.next/
 /out/
+/public  # Added this line to ignore the public folder
 
 # production
 /build

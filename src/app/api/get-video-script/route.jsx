@@ -9,7 +9,7 @@ export async function POST(req) {
         const result = await chatSession.sendMessage(prompt);
         const responseText = result.response.text();
 
-        console.log("Raw Response:", responseText);
+        //console.log("Raw Response:", responseText);
 
         let parsedResult;
         try {

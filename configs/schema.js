@@ -1,5 +1,5 @@
 
-import { boolean, pgTable, serial, varchar, jsonb,uuid, text } from "drizzle-orm/pg-core";
+import { boolean, pgTable, serial, varchar, jsonb,uuid, text, integer } from "drizzle-orm/pg-core";
 
 
 
@@ -8,7 +8,8 @@ export const schema_var=pgTable('tablename',{
     name:varchar('name').notNull(),
     email:varchar('email').notNull(),
     imageurl:varchar('imageurl'),
-    subscription:boolean('subscription').default(false)
+    subscription:boolean('subscription').default(false),
+    credits:integer('credits').default(20)//Equivalent to 2 Videos
 })
 
 

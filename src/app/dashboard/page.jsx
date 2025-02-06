@@ -1,17 +1,31 @@
 "use client"
 import { Button } from '@/components/ui/button'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import EmptyState from './_components/EmptyState'
 import Link from 'next/link'
 import { db_VAR } from '../../../configs/db'
 import { videoDataTableName } from '../../../configs/schema'
 import { eq } from 'drizzle-orm'
+import { useUser } from '@clerk/nextjs'
+import VideoList from './_components/VideoList'
 
 function Dashboard() {
+  
+  /*Use to get all videos via user signed email */
   const [videolist, setvideolist] = useState([])
+  const {user}=useUser();
+  const getVideoList=async()=>{
+    const resp=await db_VAR.select().from(videoDataTableName)
+    .where(eq(videoDataTableName?.createdBy,user?.primaryEmailAddress?.emailAddress))
 
-  // const resp=await db_VAR.select().from(videoDataTableName)
-  // .where(eq(videoDataTableName?.cre))
+    //console.log(resp)
+    setvideolist(resp)
+  }
+
+  useEffect(()=>{
+    getVideoList();
+  },[user])
+
 
   return (
     <div className="pt-10"> {/* Add padding-top to prevent overlap with sticky header */}
@@ -29,6 +43,7 @@ function Dashboard() {
       )}
 
       {/*To show all list of videos ,,jo bun chuki hai pehle se */}
+      <VideoList VideoListData={videolist} SetVideoListData={setvideolist}/>
     </div>
   )
 }

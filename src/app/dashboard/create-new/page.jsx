@@ -10,8 +10,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { VideoDataContext } from '@/app/_context/videoDataContext';
 import { db_VAR } from '../../../../configs/db';
 import { useUser } from '@clerk/nextjs';
-import { videoDataTableName } from '../../../../configs/schema';
+import { schema_var, videoDataTableName } from '../../../../configs/schema';
 import PlayerDialog from '../_components/PlayerDialog';
+import { UserDetailContext } from '@/app/_context/UserDetailContext';
+import { eq } from 'drizzle-orm';
 
 function CreateNewVideo() {
   const [formDataa, setformdata] = useState({});
@@ -22,20 +24,30 @@ function CreateNewVideo() {
   const [captions,setcaptions]=useState(null);
   
   //To Play Video
-  const[playVideoValue,setplayVideoValue]=useState(true)
-  const[videoIdValue,setvideoIdValue]=useState("f512ee39-f0cf-451d-af2e-b52a49101c21")
+  const[playVideoValue,setplayVideoValue]=useState(false)
+  const[videoIdValue,setvideoIdValue]=useState(null)
 
 
   //use context
-  const {videoData,setvideoData}=useContext(VideoDataContext)
+  const {videoData,setvideoData}=useContext(VideoDataContext);
 
   //getting user email/id  from clerk:jis bhi id se sign in hua ho user
   const {user}=useUser();
 
+  //TO Check ki Image Generate krne se pehle,,ki Credits Buche hain ya nhi
+  const {userDetail,setuserDetail}=useContext(UserDetailContext);
+  const [showPopup, setShowPopup] = useState(false);//to show popup
+
 
 
   const HandleSubmitButton = () => {
+    console.log("Credits:",userDetail.credits)
+    if(userDetail.credits<9){//Image Generate krne se pehle,,ki Credits Buche hain ya nhi,,1 video k liye 10 Credits use honge
+      setShowPopup(true);
+      return;
+    }
     GetVideoScript();
+ 
   };
 
   const onhandleInputChange = (fieldname, fieldvalue) => {
@@ -175,32 +187,39 @@ function CreateNewVideo() {
   //To generate images from prompt--> using Replicate ai
   const generateImage = async (videoScriptData) => {
     setloading(true);
-  
+
     let images = [];
-    const maxImages = 4; // Limit to 4 images
-    const limitedScriptData = videoScriptData.slice(0, maxImages); // Take first 5 elements,,that generate 5 images
-  
+    const maxImages = formDataa.duration === "2" ? 2 : 4; // 10s → 2 images, 20s → 4 images
+    const limitedScriptData = videoScriptData.slice(0, maxImages); // Limit script data to required images
+
     for (const element of limitedScriptData) {
       try {
         const resp = await axios.post('/api/generate-images', {
-          promptdata: element.imagePrompt, // Generate images from prompts
+          promptdata: element.imagePrompt,
         });
-  
-        setvideoData((prev) => ({
-          ...prev,
-          'imagesUrl': [...(prev.imagesUrl || []), resp.data.result], // Store images in state
-        }));
-  
-        images.push(resp.data.result);
+
+        images.push(resp.data.result); // Store generated image URLs
       } catch (error) {
         console.error("Error generating image:", error);
-      } finally {
-        setImageList(images);
-        setloading(false);
       }
     }
-  };
-  
+
+    setvideoData((prev) => ({
+      ...prev,
+      imagesUrl: images, // Store all images in one array for a single video
+    }));
+
+    setImageList(images);
+    setloading(false);
+
+    // Trigger video creation after all images are generated
+    generateVideo(images);
+};
+
+/*This will generate:
+✅ 2 images for 10 seconds
+✅ 4 images for 20 seconds */
+
 
 
 
@@ -209,6 +228,9 @@ function CreateNewVideo() {
     if (videoData?.videoScript && videoData?.audiofileUrl && videoData?.captions && videoData?.imagesUrl) {
       console.log("Saving Video Data:", videoData);
       SaveVideoData(videoData);
+
+      UpdateUserDetails();
+
     } else {
       console.log("Error in useEffect: Missing fields", videoData);
     }
@@ -221,18 +243,11 @@ function CreateNewVideo() {
 
   //Method-->jo hmare Database mai,,store krayega Data,,table name se data jaata hai
   const SaveVideoData = async (videoData) => {
-    setloading(true);
-  
+    if (!videoScriptData && (!imageURLs || imageURLs.length !== 4)) {
+      setloading(true); // Show loading instead of error
+      return;
+    }
     try {
-      if (
-        !videoData?.videoScript ||
-        !Array.isArray(videoData.imagesUrl) ||
-        videoData.imagesUrl.length !== 4
-      ) {
-        console.error("Error: Missing videoScript or exactly 4 image URLs required.", videoData);
-        return;
-      }
-  
       const result = await db_VAR.insert(videoDataTableName)
         .values({
           videoScript: videoData.videoScript,
@@ -244,8 +259,8 @@ function CreateNewVideo() {
         .returning();
   
       console.log("Saved data:", result);
-      setvideoIdValue(result[0].id);
-      setplayVideoValue(true)
+      setvideoIdValue(result[0]?.id);
+      setplayVideoValue(true);
 
     } catch (error) {
       console.error("Error saving video data:", error);
@@ -255,9 +270,30 @@ function CreateNewVideo() {
   };
 
 
+  //Method -->jO CREDITS,,cut krega,,hr video bnane pr
+  const UpdateUserDetails=async()=>{
+    const resp=await db_VAR.update(schema_var).set({
+      credits:userDetail?.credits-10 //10 Minus after 1 video Gneration
+    }).where(eq(schema_var.email,user?.primaryEmailAddress?.emailAddress))
+
+    setuserDetail(prev=>({
+      ...prev,
+      "credits":userDetail?.credits-10 //update in Database
+    }))
+  }
+
+
   return (
-    <div className="md:px-20 mt-[25px] ">
+    <div className="relative md:px-20 mt-[25px]">
+    {/* Background content blur */}
+    {showPopup && (
+      <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-10" />
+    )}
+  
+    {/* Main content with optional blur effect */}
+    <div className={`${showPopup ? 'blur-sm pointer-events-none' : ''}`}>
       <h2 className="font-bold text-4xl mr-12 mt-8 text-purple-600 text-center">Create New</h2>
+  
       <div className="mt-10 shadow-lg p-10">
         <SelectTopic onUserSelect={onhandleInputChange} />
         <SelectStyle onUserSelect={onhandleInputChange} />
@@ -267,9 +303,27 @@ function CreateNewVideo() {
         </Button>
       </div>
       <CustomLoading loading={loading} />
-      <PlayerDialog playVideo={playVideoValue} videoId={videoIdValue}/>
-
+      <PlayerDialog playVideo={playVideoValue} videoId={videoIdValue} />
     </div>
+  
+    {/* The Popup (on top of all content, not blurred) */}
+    {showPopup && (
+      <div className="fixed inset-0 flex items-center justify-center z-50">
+        <div className="bg-white p-6 rounded-lg shadow-lg text-center w-96">
+          <h2 className="text-xl font-bold text-red-600">No Credits Left!!</h2>
+          <p className="text-gray-700 mt-2">You need at least 10 credits to generate a video.</p>
+          <button
+            onClick={() => setShowPopup(false)}
+            className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    )}
+  </div>
+  
+
   );
 }
 

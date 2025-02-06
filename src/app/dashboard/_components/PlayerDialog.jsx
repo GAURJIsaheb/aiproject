@@ -23,8 +23,10 @@ function PlayerDialog({ playVideo, videoId, onClose }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setOpenDialog(playVideo);
-    if (videoId) GetVideoData();
+    if (playVideo) {
+      setOpenDialog(true);
+      if (videoId) GetVideoData();
+    }
   }, [playVideo]);
 
   // Fetch video data from the database

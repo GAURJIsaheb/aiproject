@@ -47,7 +47,7 @@ function Sidebar() {
   return (
     <div
       className={cn(
-        "fixed top-[82px] left-0 h-[calc(100vh)] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-sm transition-all duration-300 ease-in-out z-50",
+        "fixed top-[62px] left-0 h-[calc(100vh)] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-sm transition-all duration-300 ease-in-out z-50",
         isOpen ? "w-64" : "w-16"
       )}
     >
