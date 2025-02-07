@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { renderMedia } from "@remotion/renderer";
 import path from "path";
-import fs from "fs";
-import RemotionVideo from "@/components/RemotionVideo"; // Adjust this path as needed
+// import fs from "fs";
+import RemotionVideo from "@/app/dashboard/_components/RemotionVideo";
+
 
 export async function POST(req) {
   try {

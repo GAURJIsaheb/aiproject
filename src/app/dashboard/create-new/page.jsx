@@ -166,7 +166,7 @@ function CreateNewVideo() {
 
 
        
-    //resp?.data?.result && await generateImage(videoScriptData);
+    resp?.data?.result && await generateImage(videoScriptData);
 
     } catch (error) {
       console.error("Error generating captions:", error.message || error);
@@ -213,7 +213,7 @@ function CreateNewVideo() {
     setloading(false);
 
     // Trigger video creation after all images are generated
-    generateVideo(images);
+    //->generateVideo(images);
 };
 
 /*This will generate:

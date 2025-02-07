@@ -22,7 +22,7 @@
     "@radix-ui/react-select": "^2.1.5",
     "@radix-ui/react-slot": "^1.1.1",
     "@remotion/cli": "4.0.258",
-    "@remotion/renderer": "^4.0.259",
+    "@remotion/renderer": "^4.0.260",
     "assemblyai": "^4.8.0",
     "axios": "^1.7.9",
     "class-variance-authority": "^0.7.1",
