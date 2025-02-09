@@ -9,6 +9,7 @@
     "lint": "next lint",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio"
+
   },
   "dependencies": {
     "@clerk/nextjs": "^6.9.14",
@@ -19,10 +20,15 @@
     "@neondatabase/serverless": "^0.10.4",
     "@radix-ui/react-alert-dialog": "^1.1.5",
     "@radix-ui/react-dialog": "^1.1.5",
+    "@radix-ui/react-progress": "^1.1.2",
     "@radix-ui/react-select": "^2.1.5",
     "@radix-ui/react-slot": "^1.1.1",
-    "@remotion/cli": "4.0.258",
+    "@remotion/bundler": "^4.0.260",
+    "@remotion/cli": "^4.0.260",
+    "@remotion/player": "^4.0.260",
     "@remotion/renderer": "^4.0.260",
+    "@remotion/streaming": "^4.0.260",
+    "@remotion/studio": "^4.0.260",
     "assemblyai": "^4.8.0",
     "axios": "^1.7.9",
     "class-variance-authority": "^0.7.1",
@@ -36,7 +42,7 @@
     "openai": "^4.80.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "remotion": "4.0.258",
+    "remotion": "^4.0.260",
     "replicate": "^1.0.1",
     "say": "^0.16.0",
     "tailwind-merge": "^2.6.0",

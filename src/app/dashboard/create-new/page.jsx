@@ -189,7 +189,7 @@ function CreateNewVideo() {
     setloading(true);
 
     let images = [];
-    const maxImages = formDataa.duration === "2" ? 2 : 4; // 10s → 2 images, 20s → 4 images
+    const maxImages = formDataa.duration === "3" ? 2 : 4; // 10s → 2 images, 20s → 4 images
     const limitedScriptData = videoScriptData.slice(0, maxImages); // Limit script data to required images
 
     for (const element of limitedScriptData) {

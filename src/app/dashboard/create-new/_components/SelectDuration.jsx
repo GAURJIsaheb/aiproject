@@ -23,7 +23,7 @@ function SelectDuration({onUserSelect}) {
 
                 <SelectItem  value={3}>10 Seconds</SelectItem>
                 
-                <SelectItem value={4}>20 Seconds</SelectItem>
+                <SelectItem value={5}>20 Seconds</SelectItem>
             </SelectContent>
         </Select>
         </div>
