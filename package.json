@@ -9,10 +9,9 @@
     "lint": "next lint",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio"
-
   },
   "dependencies": {
-    "@clerk/nextjs": "^6.9.14",
+    "@clerk/nextjs": "^6.11.2",
     "@fal-ai/client": "^1.2.3",
     "@fal-ai/serverless-client": "^0.15.0",
     "@google-cloud/text-to-speech": "^5.8.0",
@@ -25,6 +24,7 @@
     "@radix-ui/react-slot": "^1.1.1",
     "@remotion/bundler": "^4.0.260",
     "@remotion/cli": "^4.0.260",
+    "@remotion/compositor-win32-x64-msvc": "^4.0.260",
     "@remotion/player": "^4.0.260",
     "@remotion/renderer": "^4.0.260",
     "@remotion/streaming": "^4.0.260",
@@ -58,7 +58,6 @@
     "tailwindcss": "^3.4.1"
   },
   "engines": {
-  "node": "20.x"
-}
-
+    "node": "20.x"
+  }
 }
