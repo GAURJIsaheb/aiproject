@@ -50,7 +50,7 @@ function VideoList({ VideoListData, SetVideoListData }) {
                   }}
                   inputProps={{
                     ...video,
-                    setTotalduration: (v) => console.log(v),
+                    setTotalduration: () => {},
                   }}
                 />
                 
