@@ -1,0 +1,12 @@
+{
+    "extends": ["next", "next/core-web-vitals"],
+    "parserOptions": {
+      "ecmaVersion": 2020,
+      "sourceType": "module",
+      "allowImportExportEverywhere": true
+    },
+    "rules": {
+      // Add or override specific rules here if necessary
+    }
+  }
+  

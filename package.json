@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "postinstall": "node ./scripts/install.mjs"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.11.2",
