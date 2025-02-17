@@ -1,3 +1,4 @@
+"use client"
 import React, { useEffect } from 'react';
 import { AbsoluteFill, Audio, Sequence, useCurrentFrame, useVideoConfig, spring, interpolate } from 'remotion';
 

@@ -1,3 +1,4 @@
+"use client"
 import React, { useState } from "react";
 import { Thumbnail } from "@remotion/player";
 import axios from 'axios';
