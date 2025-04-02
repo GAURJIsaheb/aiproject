@@ -33,8 +33,9 @@
     "@remotion/player": "4.0.265",
     "@remotion/renderer": "^4.0.265",
     "@remotion/studio": "^4.0.265",
+    "@stripe/stripe-js": "^5.6.0",
     "assemblyai": "^4.8.0",
-    "axios": "^1.7.9",
+    "axios": "^1.8.3",
     "class-variance-authority": "^0.7.1",
     "cloudinary": "^2.5.1",
     "clsx": "^2.1.1",
@@ -51,6 +52,7 @@
     "remotion": "4.0.265",
     "replicate": "^1.0.1",
     "say": "^0.16.0",
+    "stripe": "^17.6.0",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^11.0.5"

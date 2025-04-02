@@ -51,7 +51,7 @@ function CreateNewVideo() {
   };
 
   const onhandleInputChange = (fieldname, fieldvalue) => {
-    console.log(fieldname, fieldvalue);
+    //console.log(fieldname, fieldvalue);
     setformdata((prev) => ({
       ...prev,
       [fieldname]: fieldvalue
@@ -226,7 +226,7 @@ function CreateNewVideo() {
 
   useEffect(() => {
     if (videoData?.videoScript && videoData?.audiofileUrl && videoData?.captions && videoData?.imagesUrl) {
-      console.log("Saving Video Data:", videoData);
+      //console.log("Saving Video Data:", videoData);
       SaveVideoData(videoData);
 
       UpdateUserDetails();
@@ -258,7 +258,7 @@ function CreateNewVideo() {
         })
         .returning();
   
-      console.log("Saved data:", result);
+      //console.log("Saved data:", result);
       setvideoIdValue(result[0]?.id);
       setplayVideoValue(true);
 
